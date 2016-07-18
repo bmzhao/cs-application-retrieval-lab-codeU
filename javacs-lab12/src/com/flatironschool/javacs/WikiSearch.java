@@ -1,12 +1,7 @@
 package com.flatironschool.javacs;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import redis.clients.jedis.Jedis;
@@ -44,7 +39,6 @@ public class WikiSearch {
 	/**
 	 * Prints the contents in order of term frequency.
 	 * 
-	 * @param map
 	 */
 	private  void print() {
 		List<Entry<String, Integer>> entries = sort();
@@ -60,8 +54,15 @@ public class WikiSearch {
 	 * @return New WikiSearch object.
 	 */
 	public WikiSearch or(WikiSearch that) {
-        // FILL THIS IN!
-		return null;
+		Set<String> union = new HashSet<>(map.keySet());
+		union.addAll(that.map.keySet());
+		Map<String, Integer> toReturn = new HashMap<>();
+		for (String url : union) {
+			toReturn.put(url, getRelevance(url) + that.getRelevance(url));
+		}
+
+		// FILL THIS IN!
+		return new WikiSearch(toReturn);
 	}
 	
 	/**
@@ -71,8 +72,15 @@ public class WikiSearch {
 	 * @return New WikiSearch object.
 	 */
 	public WikiSearch and(WikiSearch that) {
-        // FILL THIS IN!
-		return null;
+		Set<String> union = new HashSet<>(map.keySet());
+		union.retainAll(that.map.keySet());
+		Map<String, Integer> toReturn = new HashMap<>();
+		for (String url : union) {
+			toReturn.put(url, getRelevance(url) + that.getRelevance(url));
+		}
+
+		// FILL THIS IN!
+		return new WikiSearch(toReturn);
 	}
 	
 	/**
@@ -82,8 +90,15 @@ public class WikiSearch {
 	 * @return New WikiSearch object.
 	 */
 	public WikiSearch minus(WikiSearch that) {
-        // FILL THIS IN!
-		return null;
+		Set<String> union = new HashSet<>(map.keySet());
+		union.removeAll(that.map.keySet());
+		Map<String, Integer> toReturn = new HashMap<>();
+		for (String url : union) {
+			toReturn.put(url, getRelevance(url) + that.getRelevance(url));
+		}
+
+		// FILL THIS IN!
+		return new WikiSearch(toReturn);
 	}
 	
 	/**
@@ -104,8 +119,17 @@ public class WikiSearch {
 	 * @return List of entries with URL and relevance.
 	 */
 	public List<Entry<String, Integer>> sort() {
-        // FILL THIS IN!
-		return null;
+		List<Entry<String, Integer>> toReturn = new ArrayList<>();
+		for (String url : map.keySet()) {
+			toReturn.add(new AbstractMap.SimpleImmutableEntry<String, Integer>(url, map.get(url)));
+		}
+		Collections.sort(toReturn, new Comparator<Entry<String, Integer>>() {
+			@Override
+			public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
+				return Integer.compare(o1.getValue(), o2.getValue());
+			}
+		});
+		return toReturn;
 	}
 
 	/**
